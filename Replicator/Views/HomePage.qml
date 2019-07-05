@@ -77,7 +77,7 @@ Item {
         }
 
         Button {
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             topPadding: 9 * scaleFactor
             bottomPadding: topPadding
             rightPadding: 24 * scaleFactor

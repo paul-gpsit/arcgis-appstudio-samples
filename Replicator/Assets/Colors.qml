@@ -18,6 +18,9 @@ Item {
     readonly property color black_54: "#8A000000"
     readonly property color black_38: "#61000000"
 
+    //Green
+    readonly property color green_33: "#3323C115"
+
     // Background color
     readonly property color white_background: "#FFEFEFEF"
 
@@ -26,4 +29,6 @@ Item {
     readonly property color card_border: "#D1D1D1"
 
     readonly property color default_content_color: "#EFEFEF"
+    readonly property color red: "#FF0000"
+    readonly property color red_background: "#33FF0000"
 }

@@ -8,6 +8,7 @@ import ArcGIS.AppFramework.Controls 1.0
 
 Item {
     property string itemId: ""
+    property var portalBItemId
 
     property int resultState: 1 //0 = default, 1 = loading, 2 = error, 3 = done
 
@@ -25,7 +26,7 @@ Item {
         Item {
             Layout.preferredWidth: 120 * scaleFactor
             Layout.preferredHeight: 120 * scaleFactor
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             AnimatedImage {
                 width: 100 * scaleFactor
                 height: width
@@ -46,7 +47,7 @@ Item {
             leftPadding: rightPadding
             rightPadding: 0
             horizontalAlignment: Label.AlignHCenter
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             font {
                 weight: Font.Medium
                 pixelSize: 16 * scaleFactor
@@ -66,7 +67,7 @@ Item {
             leftPadding: rightPadding
             rightPadding: 0
             horizontalAlignment: Label.AlignHCenter
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             font {
                 weight: Font.Medium
                 pixelSize: 16 * scaleFactor
@@ -95,7 +96,7 @@ Item {
         Label {
             text: resultState === 3 ? strings.step4_success : strings.step4_failed
             horizontalAlignment: Label.AlignHCenter
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             font {
                 weight: Font.Normal
                 pixelSize: 24 * scaleFactor
@@ -114,7 +115,7 @@ Item {
             Layout.preferredHeight: Math.min(parent.width - 104 * scaleFactor, 256 * scaleFactor)
             source: resultState === 3 ? sources.success_image : sources.failed_image
             fillMode: Image.PreserveAspectFit
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
         }
 
         Item {
@@ -124,7 +125,7 @@ Item {
 
         Button {
             Layout.preferredWidth: 192 * scaleFactor
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             topPadding: 9 * scaleFactor
             bottomPadding: topPadding
             rightPadding: 24 * scaleFactor
@@ -142,7 +143,12 @@ Item {
 
             onClicked: {
                 var webURL = portalB.url + "/home/item.html?id=" + transferManager._destItemId;
-                AppFramework.clipboard.share(webURL);
+                if (AppFramework.clipboard.supportsShare){
+                    AppFramework.clipboard.share(webURL);
+                }
+                else{
+                    AppFramework.clipboard.copy(webURL);
+                }
             }
 
         }
@@ -155,7 +161,7 @@ Item {
 
         Button {
             Layout.preferredWidth: 192 * scaleFactor
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             topPadding: 9 * scaleFactor
             bottomPadding: topPadding
             rightPadding: 24 * scaleFactor
@@ -195,7 +201,7 @@ Item {
 
         transferManager.transfer(itemId, function(){
             resultState = 3;
-        });
+        }, portalBItemId);
     }
 
     Component.onCompleted: {

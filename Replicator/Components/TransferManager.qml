@@ -205,7 +205,14 @@ Item {
         makeNetworkConnection(5, url, obj, "POST", "json", "", callback);
     }
 
-    function transfer(itemId, callback) {
+    function updateTags(){
+        var itemTag = "Replicator_originId_%1".arg(_sourceItemId)
+        if (!_itemInfoTemplate.tags.includes(itemTag)){
+            _itemInfoTemplate.tags.push(itemTag)
+        }
+    }
+
+    function transfer(itemId, callback, targetItemId) {
         if(!(itemId > "")) return;
 
         _sourceItemId = itemId;
@@ -214,15 +221,30 @@ Item {
             _itemInfoTemplate = sourceItemInfo;
             _itemThumbnail = sourceItemInfo.thumbnail;
 
+            updateTags();
+
             downloadData(_sourceItemId, function() {
                 downloadThumbnail(_sourceItemId, _itemThumbnail, function(){
-                    addItem(_itemInfoTemplate, function(response){
-                        _destItemId = response.id;
+
+                    if (targetItemId && targetItemId > ""){
+                        //if we have a target item, then skip the add item step and just update this item.
+                        _destItemId = targetItemId;
                         updateItemContent(_destItemId, _itemInfoTemplate, function(){
                             clearAllTempFiles();
                             callback();
                         });
-                    })
+                    }
+                    else{
+                        //we only want to add a new item if we aren't updating an existing app
+                        addItem(_itemInfoTemplate, function(response){
+                            _destItemId = response.id;
+                            updateItemContent(_destItemId, _itemInfoTemplate, function(){
+                                clearAllTempFiles();
+                                callback();
+                            });
+                        })
+                    }
+
                 })
             })
         })

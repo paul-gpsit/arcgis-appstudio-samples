@@ -12,10 +12,18 @@ Page {
     id: root
 
     property var itemDetails
+    property var portalBItemDetails
 
     signal next()
     signal back()
     signal editContent();
+
+    function getPortalBItemId(){
+        if (portalBItemDetails && portalBItemDetails.hasOwnProperty("id")){
+            return portalBItemDetails.id;
+        }
+        return undefined;
+    }
 
     Flickable {
         anchors.fill: parent
@@ -65,6 +73,7 @@ Page {
             }
 
             Rectangle {
+                //this is the card for the details of the source app to copy
                 Layout.fillWidth: true
                 Layout.preferredHeight: 132 * scaleFactor
 
@@ -195,6 +204,146 @@ Page {
             }
 
             Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 16 * scaleFactor
+            }
+
+
+            Rectangle {
+                //this is the card for the details of the target app to overwrite.
+                //only visible if there is a target app to overwrite.
+                visible: portalBItemDetails !== undefined;
+                Layout.fillWidth: true
+                Layout.preferredHeight: 132 * scaleFactor
+
+                color: colors.red_background
+                border.width: 1
+                border.color: colors.red
+                radius: 2 * scaleFactor
+                clip: true
+
+                ColumnLayout {
+                    width: parent.width - 32 * scaleFactor
+                    height: parent.height
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 0
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 16 * scaleFactor
+                    }
+
+                    Label {
+                        Layout.fillWidth: true
+                        text: strings.target_app
+                        font {
+                            weight: Font.Medium
+                            pixelSize: 12 * scaleFactor
+                        }
+                        color: colors.black_54
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 16 * scaleFactor
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 52 * scaleFactor
+
+                        RowLayout {
+                            anchors.fill: parent
+                            spacing: 0
+
+                            Image {
+                                Layout.fillHeight: true
+                                Layout.preferredWidth: 78 * scaleFactor
+                                source: portalBItemDetails && portalBItemDetails.thumbnail > "" && status != Image.Error ? portalBItemDetails.thumbnail : sources.placeholder
+                                fillMode: Image.PreserveAspectFit
+                            }
+
+                            Item {
+                                Layout.fillHeight: true
+                                Layout.preferredWidth: 16 * scaleFactor
+                            }
+
+                            Item {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+
+                                ColumnLayout {
+                                    width: parent.width
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 0
+
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: portalBItemDetails ? portalBItemDetails.title : ""
+                                        leftPadding: rightPadding
+                                        rightPadding: 0
+                                        maximumLineCount: 2
+                                        wrapMode: Label.Wrap
+                                        font {
+                                            weight: Font.Normal
+                                            pixelSize: 14 * scaleFactor
+                                        }
+                                        color: colors.black_87
+                                        clip: true
+                                        elide: Label.ElideRight
+                                    }
+
+                                    Item {
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 4 * scaleFactor
+                                    }
+
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: portalBItemDetails ? portalBItemDetails.owner : ""
+                                        leftPadding: rightPadding
+                                        rightPadding: 0
+                                        font {
+                                            weight: Font.Normal
+                                            pixelSize: 12 * scaleFactor
+                                        }
+                                        color: colors.black_54
+                                        clip: true
+                                        elide: Label.ElideRight
+                                    }
+
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: portalBItemDetails ? portalBItemDetails.modified : ""
+                                        leftPadding: rightPadding
+                                        rightPadding: 0
+                                        font {
+                                            weight: Font.Normal
+                                            pixelSize: 12 * scaleFactor
+                                        }
+                                        color: colors.black_54
+                                        clip: true
+                                        elide: Label.ElideRight
+                                    }
+                                }
+                            }
+
+                            Item {
+                                Layout.fillHeight: true
+                                Layout.preferredWidth: 0 * scaleFactor
+                            }
+                        }
+                    }
+
+                    Item {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                    }
+                }
+            }
+
+            Item {
+                visible: portalBItemDetails !== undefined;
                 Layout.fillWidth: true
                 Layout.preferredHeight: 16 * scaleFactor
             }

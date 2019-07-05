@@ -16,12 +16,14 @@ Item {
     readonly property string arcgis_enterprise: qsTr("ArcGIS Enterprise")
 
     readonly property string step2_description: qsTr("Select the app you would like to copy.")
+    readonly property string step2_description_update: qsTr("Select the app that you would like to update.")
     readonly property string step2_showing: qsTr("Showing %L1 of %L2")
     readonly property string step2_myapps: qsTr("My apps")
     readonly property string step2_allapps: qsTr("All apps")
 
     readonly property string step3_description: qsTr("Does everything look right?")
-    readonly property string source_app: qsTr("App")
+    readonly property string source_app: qsTr("Source App")
+    readonly property string target_app: qsTr("Target App (WILL BE OVERWRITTEN!)")
 
     readonly property string step4_success: qsTr("Copy completed!")
     readonly property string step4_failed: qsTr("Copy failed.")
@@ -50,4 +52,10 @@ Item {
     readonly property string action_3: qsTr("Downloading thumbnail")
     readonly property string action_4: qsTr("Creating new item...")
     readonly property string action_5: qsTr("Uploading package...")
+
+    readonly property string addorupdatepage_title: qsTr("Add New or Update?")
+    readonly property string addorupdatepage_description: qsTr("Would you like to copy this app across as a new item, or update an existing item?")
+    readonly property string addorupdatepage_warning: qsTr("WARNING: updating an existing item will completely replace that item's contents. Please ensure you select the correct item!")
+    readonly property string addorupdatepage_addnew: qsTr("ADD AS NEW ITEM")
+    readonly property string addorupdatepage_updateexisting: qsTr("UPDATE EXISTING")
 }

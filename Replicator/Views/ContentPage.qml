@@ -14,12 +14,16 @@ Page {
     property string selectedItemId: ""
 
     property var itemDetails
+    property var portalBItemDetails
 
     property int nextStart: 1
     property bool isPageLoading: false
     property bool isNextPageLoading: false
     property int totalResultCount: 0
     property bool isMyApps: true
+
+    property var _networkManager: targetPortal === "PortalB" ? networkManagerPortalB : networkManager;
+    property string targetPortal: "PortalA"
 
     signal next()
     signal back()
@@ -38,8 +42,8 @@ Page {
 
         Label {
             Layout.preferredWidth: parent.width - 32 * scaleFactor
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: strings.step_no.arg(2)
+            Layout.alignment: Qt.AlignHCenter
+            text: targetPortal === "PortalB" ? strings.step_no.arg("2a") : strings.step_no.arg(2)
             font {
                 weight: Font.Normal
                 pixelSize: 24 * scaleFactor
@@ -54,8 +58,8 @@ Page {
 
         Label {
             Layout.preferredWidth: parent.width - 32 * scaleFactor
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: strings.step2_description
+            Layout.alignment: Qt.AlignHCenter
+            text: targetPortal === "PortalB" ? strings.step2_description_update : strings.step2_description
             font {
                 weight: Font.Normal
                 pixelSize: 14 * scaleFactor
@@ -178,16 +182,42 @@ Page {
                 }
             }
 
-            delegate: Item {
+            delegate: Rectangle {
                 width: parent.width
                 height: 84 * scaleFactor
+
+                color: tagMatch === true ? colors.green_33 : "transparent"
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        selectedItemId = itemId;
-                        itemDetails = details;
+                        selectItem()
                     }
+                    onDoubleClicked: {
+                        selectItem()
+                        Qt.openUrlExternally( copyToClipboard() )
+                    }
+                    onPressAndHold: {
+                        selectItem()
+                        Qt.openUrlExternally( copyToClipboard() )
+                    }
+
+                    function selectItem(){
+                        selectedItemId = itemId;
+                        if (targetPortal === "PortalB"){
+                            portalBItemDetails = details
+                        }
+                        else{
+                            itemDetails = details;
+                        }
+                    }
+
+                    function copyToClipboard(){
+                        var webURL = _networkManager.rootUrl + "/home/item.html?id=" + itemId;
+                        AppFramework.clipboard.copy(webURL)
+                        return webURL;
+                    }
+
                 }
 
                 Rectangle {
@@ -283,7 +313,7 @@ Page {
                     IconImage {
                         Layout.preferredWidth: 21 * scaleFactor
                         Layout.preferredHeight: 21 * scaleFactor
-                        anchors.verticalCenter: parent.verticalCenter
+                        Layout.alignment: Qt.AlignVCenter
                         color: colors.primary_color
                         source: itemId === selectedItemId ? sources.radio_checked : sources.radio_unchecked
                     }
@@ -325,7 +355,7 @@ Page {
     }
 
     function getContents(start){
-        networkManager.getApps(start, isMyApps, function(response){
+        _networkManager.getApps(start, isMyApps, function(response){
             nextStart = response.nextStart;
             totalResultCount = response.total;
 
@@ -338,7 +368,7 @@ Page {
                     for(var i in results) {
                         result = results[i];
 
-                        var thumbnail = "", itemId = "", modified = "", owner = "", title = "";
+                        var thumbnail = "", itemId = "", modified = "", owner = "", title = "", tagMatch = false;
 
                         if(result.hasOwnProperty("id") && result.id !== null) itemId = result.id;
                         if(result.hasOwnProperty("modified") && result.modified !== null) {
@@ -351,13 +381,19 @@ Page {
                             var thumbnailId = result.thumbnail;
 
                             if(thumbnailId > "") {
-                                thumbnail = networkManager.rootUrl + "/sharing/rest/content/items/"
-                                        + itemId + "/info/" + thumbnailId + "?token=" + networkManager.token;
+                                thumbnail = _networkManager.rootUrl + "/sharing/rest/content/items/"
+                                        + itemId + "/info/" + thumbnailId + "?token=" + _networkManager.token;
                                 result.thumbnail = thumbnail;
                             }
                         }
+                        if (result.hasOwnProperty("tags") && result.tags !== null && itemDetails && itemDetails.hasOwnProperty("id")){
+                            var itemTag = "Replicator_originId_%1".arg(itemDetails.id);
+                            if (result.tags.includes(itemTag)){
+                                tagMatch = true;
+                            }
+                        }
 
-                        contentModel.append({itemId: itemId, modified: modified, owner: owner, title: title, thumbnail: thumbnail, details: result});
+                        contentModel.append({itemId: itemId, modified: modified, owner: owner, title: title, thumbnail: thumbnail, details: result, tagMatch: tagMatch});
                     }
 
                     isNextPageLoading = false;

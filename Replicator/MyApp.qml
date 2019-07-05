@@ -166,6 +166,13 @@ App {
         id: networkManager
     }
 
+    NetworkManager{
+        id: networkManagerPortalB
+        rootUrl: portalB.url
+        token: portalB.token
+        owner: portalB.username
+    }
+
     /*--------------------------------------------------------------------------*/
 
     Portal {
@@ -191,7 +198,6 @@ App {
 
         onSignedInChanged: {
             if (signedIn) {
-                console.log("portalB signed in")
                 portalB.writeSignedInState();
                 app.settings.setValue("portalB/isloggedIn", true);
                 if(typeof stackView.currentItem.tag !== "undefined" && stackView.currentItem.tag === "websigninpage") stackView.pop(tempStackViewItem);
@@ -236,8 +242,56 @@ App {
         id: contentPage
 
         ContentPage {
+            targetPortal: "PortalA";
             onNext: {
+                stackView.push(addorupdateChoicePage, {itemDetails: itemDetails})
+            }
+
+            onBack: {
+                stackView.pop();
+            }
+        }
+    }
+
+    //Page for offering the choice to add as new item or update an existing one
+    Component{
+        id: addorupdateChoicePage
+
+        AddorUpdateChoicePage{
+            onAddNewItem: {
                 stackView.push(confirmPage, {itemDetails: itemDetails})
+            }
+
+            onUpdateExistingItem: {
+                stackView.push(contentPageB, {itemDetails: itemDetails})
+            }
+
+            onNext: {
+                switch (selectedOption){
+                case "update":
+                    stackView.push(contentPageB, {itemDetails: itemDetails})
+                    break;
+                case "add":
+                default:
+                    stackView.push(confirmPage, {itemDetails: itemDetails})
+                    break;
+                }
+            }
+
+            onBack: {
+                stackView.pop();
+            }
+        }
+    }
+
+    // Page for choosing content from portal B
+    Component {
+        id: contentPageB
+
+        ContentPage {
+            targetPortal: "PortalB";
+            onNext: {
+                stackView.push(confirmPage, {itemDetails: itemDetails, portalBItemDetails: portalBItemDetails});
             }
 
             onBack: {
@@ -252,7 +306,7 @@ App {
 
         ConfirmPage {
             onNext: {
-                stackView.push(resultPage, {itemId: itemDetails.id});
+                stackView.push(resultPage, {itemId: itemDetails.id, portalBItemId: getPortalBItemId()});
             }
 
             onBack: {
